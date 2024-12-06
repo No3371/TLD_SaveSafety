@@ -28,14 +28,14 @@ namespace SaveSafety
 
         public override void OnUpdate()
         {
-			if (Time.frameCount % 1440 != 0)
+			if (Time.frameCount % 360 != 0)
 				return;
 			if (SaveCounter % 2 != 0 || LoadCounter % 2 != 0)
 			{
-                InterfaceManager.GetPanel<Panel_HUD>().DisplayWarningMessage($"!!! SAVE SAFETY TRIGGERED !!!\nSomething blew up the saving/loading procedure\nThis is very bad and could harm your save\nSave: {SaveCounter} / Load: {LoadCounter}");
+                InterfaceManager.GetPanel<Panel_HUD>().DisplayWarningMessage($"!!! SAVE SAFETY TRIGGERED !!!\nSomething blew up the saving/loading procedure\nThis is very bad and could harm your game progress\nSave: {SaveCounter} / Load: {LoadCounter}\n(Numbers above should not be odd)");
 				if (!Triggered)
 				{
-					this.LoggerInstance.BigError($"!!! SAVE SAFETY TRIGGERED !!!\nSomething blew up the saving/loading procedure\nThis is very bad and could harm your game progress\nSave: {SaveCounter} / Load: {LoadCounter}\n(Numbers above should be even numbers)");
+					this.LoggerInstance.BigError($"!!! SAVE SAFETY TRIGGERED !!!\nSomething blew up the saving/loading procedure\nThis is very bad and could harm your game progress\nSave: {SaveCounter} / Load: {LoadCounter}\n(Numbers above should not be odd)");
 					Triggered = true;
 				}
 			}
