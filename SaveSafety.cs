@@ -39,10 +39,6 @@ namespace SaveSafety
 					Triggered = true;
 				}
 			}
-			else if (Triggered)
-			{
-				InterfaceManager.GetPanel<Panel_HUD>().ClearWarningMessage();
-			}
 
         }
     }
