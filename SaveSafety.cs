@@ -13,9 +13,9 @@ namespace SaveSafety
     internal class SaveSafety : MelonMod
     {
 		internal static SaveSafety Instance { get; private set; }
-		internal static int SaveCounter { get; set; } 
-		internal static int LoadCounter { get; set; }
-		bool Triggered { get; set; }
+		internal static bool Triggered { get; set; }
+		internal static bool SaveFlag { get; set; }
+		internal static bool LoadFlag { get; set; }
 
         public override void OnInitializeMelon()
         {
@@ -26,16 +26,28 @@ namespace SaveSafety
 			}));
         }
 
+		string LoadWarningString => $"[SAVE SAFETY TRIGGERED]\nSomething blew up the loading procedure\nIf the game saves again in this state, you may lose progress of some mods.\nConsider quitting without saving now \nSAVE: [{(SaveFlag? "X":" ")}] / LOAD: [{(LoadFlag? "X":" ")}]\n";
+		string SaveWarningString => $"[SAVE SAFETY TRIGGERED]\nSomething blew up the saving procedure\nBe aware that your progress now may not be saved if this keep happening. \nSAVE: [{(SaveFlag? "X":" ")}] / LOAD: [{(LoadFlag? "X":" ")}]\n";
+
         public override void OnUpdate()
         {
-			if (Time.frameCount % 360 != 0)
+			if (Time.frameCount % 60 != 0)
 				return;
-			if (SaveCounter % 2 != 0 || LoadCounter % 2 != 0)
+			if (SaveFlag)
 			{
-                InterfaceManager.GetPanel<Panel_HUD>().DisplayWarningMessage($"!!! SAVE SAFETY TRIGGERED !!!\nSomething blew up the saving/loading procedure\nThis is very bad and could harm your game progress\nSave: {SaveCounter} / Load: {LoadCounter}\n(Numbers above should not be odd)");
+                InterfaceManager.GetPanel<Panel_HUD>().DisplayWarningMessage(SaveWarningString);
 				if (!Triggered)
 				{
-					this.LoggerInstance.BigError($"!!! SAVE SAFETY TRIGGERED !!!\nSomething blew up the saving/loading procedure\nThis is very bad and could harm your game progress\nSave: {SaveCounter} / Load: {LoadCounter}\n(Numbers above should not be odd)");
+					this.LoggerInstance.BigError(SaveWarningString);
+					Triggered = true;
+				}
+			}
+			if (LoadFlag)
+			{
+                InterfaceManager.GetPanel<Panel_HUD>().DisplayWarningMessage(LoadWarningString);
+				if (!Triggered)
+				{
+					this.LoggerInstance.BigError(LoadWarningString);
 					Triggered = true;
 				}
 			}
@@ -63,29 +75,30 @@ namespace SaveSafety
 		[HarmonyPriority(99999999)]
 		internal static void Prefix ()
 		{
-			SaveSafety.LoadCounter++;
+			SaveSafety.LoadFlag = true;
 		}
 
     	[HarmonyPriority(-9999999)]
 		internal static void Postfix ()
 		{
-			SaveSafety.LoadCounter++;
+			SaveSafety.LoadFlag = false;
 		}
 	}
 
     [HarmonyPatch(nameof(SaveGameSystem), nameof(SaveGameSystem.SaveGlobalData))]
 	internal static class SaveGlobalData
 	{
+		static bool Flag { get; set; }
 		[HarmonyPriority(99999999)]
 		internal static void Prefix ()
 		{
-			SaveSafety.SaveCounter++;
+			SaveSafety.SaveFlag = true;
 		}
 
     	[HarmonyPriority(-9999999)]
 		internal static void Postfix ()
 		{
-			SaveSafety.SaveCounter++;
+			SaveSafety.SaveFlag = false;
 		}
 	}
 }
