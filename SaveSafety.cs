@@ -99,6 +99,25 @@ namespace SaveSafety
 		internal static void Postfix ()
 		{
 			SaveSafety.SaveFlag = false;
+			SaveSafety.Triggered = false;
+			InterfaceManager.GetPanel<Panel_HUD>()?.ClearWarningMessage();
+		}
+	}
+	
+    [HarmonyPatch(nameof(GameManager), nameof(GameManager.OnGameQuit))]
+	internal static class OnGameQuit
+	{
+		internal static void Postfix ()
+		{
+			SaveSafety.SaveFlag = SaveSafety.LoadFlag = SaveSafety.Triggered = false;
+		}
+	}
+    [HarmonyPatch(nameof(GameManager), nameof(GameManager.HandlePlayerDeath))]
+	internal static class HandlePlayerDeath
+	{
+		internal static void Postfix ()
+		{
+			SaveSafety.SaveFlag = SaveSafety.LoadFlag = SaveSafety.Triggered = false;
 		}
 	}
 }
