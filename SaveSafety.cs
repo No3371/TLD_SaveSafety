@@ -21,8 +21,8 @@ namespace SaveSafety
         {
 			Instance = this;
 
-			uConsole.RegisterCommand("fake_a_boom", new Action(() => {
-				TestExplosion.Enabled = true;
+			uConsole.RegisterCommand("savesafety_force_trigger", new Action(() => {
+				TestExplosion.Enabled = !TestExplosion.Enabled;
 			}));
         }
 
@@ -44,6 +44,7 @@ namespace SaveSafety
     }
 
     [HarmonyPatch(nameof(SaveGameSystem), nameof(SaveGameSystem.RestoreGlobalData))]
+    [HarmonyPatch(nameof(SaveGameSystem), nameof(SaveGameSystem.SaveGlobalData))]
 	internal static class TestExplosion
 	{
 		internal static bool Enabled { get; set; }
